@@ -57,36 +57,90 @@ class _CarouselPageState extends State<CarouselPage> with SingleTickerProviderSt
                         height: controller._currentPage == x ? height * .9 : 0,
                         duration: Duration(milliseconds: 1000),
                         curve: Curves.fastOutSlowIn,
-                        child: Image.network(
-                          controller.imageList.value[x],
-                          fit: BoxFit.cover,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(196, 0, 0, 0),
+                          image: DecorationImage(
+                            image: NetworkImage(controller.imageList.value[x]),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.dstATop),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text("Hai Nama saya enricko putra hartono",style:TextStyle(color: Colors.white,),),
                         ),
                       ),
                     ),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      width: 350,
+                      width: 400,
                       height: 75,
-                      padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                      // padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                      margin: EdgeInsets.only(bottom: 10),
                       decoration: BoxDecoration(
-                        color: Colors.black54
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(3),
                       ),
-                      child: LoopPageView.builder(
-                        itemCount: controller.imageList.value.length,
-                        controller: controller._pageController.value,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            width: 100,
-                            height: 50,
-                            margin: EdgeInsets.symmetric(horizontal: 5),
-                            child: Image.network(
-                              controller.imageList.value[index],
-                              fit: BoxFit.cover,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              controller._previousPage();
+                            },
+                            child: SizedBox(
+                              width: 25,
+                              height: 75,
+                              child: Icon(
+                                Icons.arrow_left_outlined,
+                                color: Colors.white,
+                              ),
                             ),
-                          );
-                        },
+                          ),
+                          Container(
+                            width: 350,
+                            height: 75,
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            child: LoopPageView.builder(
+                              itemCount: controller.imageList.value.length,
+                              controller: controller._pageController.value,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    controller._currentPage.value = index;
+                                    controller._pageController.value!.animateToPage(
+                                      index,
+                                      duration: Duration(milliseconds: 350),
+                                      curve: Curves.fastOutSlowIn,
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 50,
+                                    margin: EdgeInsets.symmetric(horizontal: 5),
+                                    child: Image.network(
+                                      controller.imageList.value[index],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              controller._nextPage();
+                            },
+                            child: SizedBox(
+                              width: 25,
+                              height: 75,
+                              child: Icon(
+                                Icons.arrow_right_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -109,11 +163,42 @@ class CarouselController extends GetxController {
     "https://images.unsplash.com/photo-1701762292610-3323efd62273?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTh8fHxlbnwwfHx8fHw%3D"
   ].obs;
 
+  Rx<Timer?> _timer = Rx<Timer?>(null);
+  Rx<Duration> _duration = Duration(seconds: 15).obs;
+
+  void _nextPage() {
+    if (_currentPage.value < imageList.length - 1) {
+      _currentPage.value++;
+    } else {
+      _currentPage.value = 0;
+    }
+    _pageController.value!.animateToPage(
+      _currentPage.value,
+      duration: Duration(milliseconds: 350),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
+  void _previousPage() {
+    print(_currentPage.value);
+    if (_currentPage.value > 0) {
+      _currentPage.value--;
+    } else {
+      _currentPage.value = imageList.length - 1;
+    }
+    print(_currentPage.value);
+    _pageController.value!.animateToPage(
+      _currentPage.value,
+      duration: Duration(milliseconds: 350),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
   @override
   void onInit() {
     super.onInit();
     _pageController.value = LoopPageController(initialPage: _currentPage.value, viewportFraction: 1 / 3);
-    Timer.periodic(Duration(seconds: 5), (Timer timer) {
+    _timer.value = Timer.periodic(_duration.value, (Timer timer) {
       if (_currentPage.value < imageList.length - 1) {
         _currentPage.value++;
       } else {
@@ -126,5 +211,11 @@ class CarouselController extends GetxController {
         curve: Curves.fastOutSlowIn,
       );
     });
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    _timer.value!.cancel();
   }
 }
