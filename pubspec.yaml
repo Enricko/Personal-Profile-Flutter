@@ -39,6 +39,7 @@ dependencies:
   carousel_slider: ^4.2.1
   get: ^4.6.6
   loop_page_view: ^1.2.5
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   flutter_test:
