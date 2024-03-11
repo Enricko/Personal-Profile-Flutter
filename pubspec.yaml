@@ -40,6 +40,7 @@ dependencies:
   get: ^4.6.6
   loop_page_view: ^1.2.5
   web_socket_channel: ^2.4.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:
