@@ -13,11 +13,13 @@ class ThemeController extends GetxController {
     if (GetStorage().read("isDarkMode") != null) {
       isDarkMode.value = GetStorage().read("isDarkMode");
       controller.value.value = GetStorage().read("isDarkMode");
+      print(controller.value.value);
     }
     controller.value.addListener(() {
       isDarkMode.value = controller.value.value;
 
       GetStorage().write("isDarkMode", isDarkMode.value);
+      print(GetStorage().read("isDarkMode"));
       Get.changeThemeMode(GetStorage().read("isDarkMode") ? ThemeMode.dark : ThemeMode.light);
     });
   }
@@ -25,6 +27,6 @@ class ThemeController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    // controller.value.dispose();
+    controller.value.dispose();
   }
 }

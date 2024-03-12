@@ -6,7 +6,8 @@ import 'package:get_storage/get_storage.dart';
 import 'pages/homepage.dart';
 import 'routes/route_list.dart';
 
-void main() {
+Future<void> main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -19,8 +20,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Enricko Profile',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      darkTheme: ThemeData.light(),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       themeMode: (GetStorage().read("isDarkMode") != null ? GetStorage().read("isDarkMode") : false)
           ? ThemeMode.dark
           : ThemeMode.light,
